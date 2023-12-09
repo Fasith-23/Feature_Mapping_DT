@@ -23,7 +23,27 @@ class Delaunay
       }
       return neigh_map;
     }
-    
+    void WriteVerticesToFile(const std::string& filename) {
+        std::ofstream outfile(filename);
+
+        if (!outfile.is_open()) {
+            std::cerr << "Unable to open file for writing: " << filename << std::endl;
+            return;
+        }
+
+        // Write vertices to the file
+        for (const auto& vertex : this->vertices) {
+            outfile << "Vertex: (" << vertex.x << ", " << vertex.y << ", " << vertex.z << ")\n";
+        }
+
+        // Write edges to the file
+        for (const auto& edge : this->edges) {
+            outfile << "Edge: [" << edge.end_vertices[0].x << ", " << edge.end_vertices[0].y << ", " << edge.end_vertices[0].z << ", " << edge.end_vertices[1].x << ", " << edge.end_vertices[1].y << ", " << edge.end_vertices[1].z << "]\n";
+        }
+
+        outfile.close();
+        std::cout << "Vertices and edges written to file: " << filename << std::endl;
+    }
   private:
     vector<Vertex_3D> vertices = {};
     vector<Vertex_3D> Hull_vertices = {};
@@ -66,8 +86,8 @@ class Delaunay
     }
     int Volume_Sign(const Face& f, const Vertex_3D& v) const
     {
-      double vol;
-      double ax, ay, az, bx, by, bz, cx, cy, cz;
+      float vol;
+      float ax, ay, az, bx, by, bz, cx, cy, cz;
       ax = f.vertices[0].x - v.x;  
       ay = f.vertices[0].y - v.y;  
       az = f.vertices[0].z - v.z;
@@ -294,7 +314,7 @@ class Delaunay
 //            unordered_map<Vertex_3D, vector<Vertex_3D>> fp = this->map_a;
 //            for(auto pt: this->map_a){
 //
-//                vector<double>ap, bp;
+//                vector<float>ap, bp;
 //                Vertex_3D point = pt.first;
 //                ap = this->dist_pt(1, point);
 //                bp = this->dist_pt(2, point);
@@ -312,7 +332,7 @@ class Delaunay
 //        unordered_map<Vertex_3D, vector<Vertex_3D>> map_a;
 //        unordered_map<Vertex_3D, vector<Vertex_3D>> map_b;
 //        
-//        bool is_equal(const vector<double> ap, const vector<double> bp){
+//        bool is_equal(const vector<float> ap, const vector<float> bp){
 //
 //            sort(ap.begin(), ap.end());
 //            sort(bp.begin(), bp.end());
@@ -330,8 +350,8 @@ class Delaunay
 //            return ans>=max_thres;
 //        }
 //
-//        vector<double> dist_pt(const int num, Vertex_3D& pt){
-//            vector<double> ans;
+//        vector<float> dist_pt(const int num, Vertex_3D& pt){
+//            vector<float> ans;
 //            if(num==1){
 //                for(auto p: this->map_a[pt]){
 //
@@ -391,13 +411,17 @@ vector<Vertex_3D> readKeypointsFromFile(const string& filename) {
 int main()
 {
   vector<Vertex_3D> tests_a = readKeypointsFromFile("keypoints.txt");
-  //vector<Vertex_3D> tests_b = readKeypointsFromFile("keypoints.txt");
+  for (const auto& vertex : tests_a) {
+        cout << "x: " << vertex.x << ", y: " << vertex.y << ", z: " << vertex.z << endl;
+  }
+
+  //vector<Vertex_3D> tests_b = readKeypointsFromFile("Feature_Matching_DT\keypoints.txt");
   Delaunay C_a(tests_a);  
   unordered_map<Vertex_3D, vector<Vertex_3D>> neighbor_map_a = C_a.Map_Neigh();
-
+  C_a.WriteVerticesToFile("output_vertices_edges_a.txt");
   //Delaunay C_b(tests_b);  
   //unordered_map<Vertex_3D, vector<Vertex_3D>> neighbor_map_b = C_b.Map_Neigh();
-//
+
   //Feature_Match Fm(neighbor_map_a, neighbor_map_b);
   //unordered_map<Vertex_3D, vector<Vertex_3D>> feature_map = Fm.check();
 //
