@@ -28,7 +28,7 @@ print("nonmaxSuppression: ", fast.getNonmaxSuppression())
 print("neighborhood: ", fast.getType())
 print("Total Keypoints with nonmaxSuppression: ", kp[0].pt)
 
-with open('Feature_Matching_DT\keypoints.txt', 'w') as file:
+with open('Feature_Matching_DT\keypoints2.txt', 'w') as file:
     for point in kp:
         x, y = point.pt
         file.write(f'{x} {y}\n')

@@ -3,7 +3,7 @@ import shutil
 
 
 # Read the output file cinng vertices and edges
-with open("Feature_Matching_DT\Delaunay_Triangulation\output_vertices_edges_a.txt", "r") as file:
+with open("Feature_Matching_DT\Delaunay_Triangulation\output_vertices_edges_b.txt", "r") as file:
     lines = file.readlines()
 
 base_image = cv2.imread("Feature_Matching_DT\Fast_Detection\input2.jpeg")  # Replace with your existing image
@@ -36,12 +36,36 @@ copied_image = base_image.copy()
 # Draw edges on the copied image
 for edge in edges:
     cv2.line(copied_image, edge[0], edge[1], (0, 255, 0), 1)  # Green lines, adjust thickness if needed
-
+for vertex in vertices:
+    cv2.circle(copied_image, vertex, 3, (255, 0, 0), -1)
 # Save the copied image with the triangulation
-shutil.copyfile("Feature_Matching_DT\Fast_Detection\input2.jpeg", "Feature_Matching_DT\Fast_Detection\output.jpeg")  # Make a copy of the original image
-cv2.imwrite("Feature_Matching_DT\Fast_Detection\output.jpeg", copied_image)  # Save the modified image
+shutil.copyfile("Feature_Matching_DT\Fast_Detection\input2.jpeg", "Feature_Matching_DT\Fast_Detection\output2.jpeg")  # Make a copy of the original image
+cv2.imwrite("Feature_Matching_DT\Fast_Detection\output2.jpeg", copied_image)  # Save the modified image
+
 
 # Display the copied image with the triangulation
 cv2.imshow("Delaunay Triangulation", copied_image)
+
+with open(r"Feature_Matching_DT\Delaunay_Triangulation\final_features.txt", "r") as file2:  # Replace with your second vertices file
+    lines2 = file2.readlines()
+
+# Parse the second set of vertices data
+vertices2 = []
+for line in lines2:
+    if line.startswith("Vertex"):
+        vertex_str = line.split("(")[1].split(")")[0]
+        x, y, z = map(float, vertex_str.split(","))
+        vertices2.append((int(x*width/10), int(y*height/10)))  # Assuming 2D points for image display
+
+# Create another copy of the image for drawing the second set of vertices
+copied_image2 = base_image.copy()
+
+# Draw vertices from the second set on the second copied image
+for vertex in vertices2:
+    cv2.circle(copied_image2, vertex, 3, (255, 0, 0), -1)  # Blue circles for second set of vertices
+shutil.copyfile("Feature_Matching_DT\Fast_Detection\input1.jpeg", r"Feature_Matching_DT\Fast_Detection\features.jpeg")  # Make a copy of the original image
+cv2.imwrite(r"Feature_Matching_DT\Fast_Detection\features.jpeg", copied_image2) 
+
+cv2.imshow("Features final", copied_image2)
 cv2.waitKey(0)
 cv2.destroyAllWindows()

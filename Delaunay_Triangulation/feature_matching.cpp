@@ -302,94 +302,83 @@ class Delaunay
 
 };
 
-//class Feature_Match{
-//  public:
-//    Feature_Match(const unordered_map<Vertex_3D, vector<Vertex_3D>> a, const unordered_map<Vertex_3D, vector<Vertex_3D>> b)
-//    {
-//      this->map_a = a;
-//      this->map_b = b;
-//      //this->check();
-//    }
-//    unordered_map<Vertex_3D, vector<Vertex_3D>> check(){
-//            unordered_map<Vertex_3D, vector<Vertex_3D>> fp = this->map_a;
-//            for(auto pt: this->map_a){
-//
-//                vector<float>ap, bp;
-//                Vertex_3D point = pt.first;
-//                ap = this->dist_pt(1, point);
-//                bp = this->dist_pt(2, point);
-//
-//                bool ans = this->is_equal(ap, bp);
-//                if (ans == false){
-//                    fp.erase(pt.first);
-//                }
-//            }
-//
-//            return fp;
-//        }
-//
-//    private:
-//        unordered_map<Vertex_3D, vector<Vertex_3D>> map_a;
-//        unordered_map<Vertex_3D, vector<Vertex_3D>> map_b;
-//        
-//        bool is_equal(const vector<float> ap, const vector<float> bp){
-//
-//            sort(ap.begin(), ap.end());
-//            sort(bp.begin(), bp.end());
-//            int sz = ap.size();
-//
-//            int threshold = 1;
-//            int max_thres = 0.8 * sz;
-//
-//            int ans = 0;
-//            for(int i = 0;i<ap.size();i++){
-//
-//                ans+=(abs(ap[i]-bp[i])<threshold);
-//            }
-//
-//            return ans>=max_thres;
-//        }
-//
-//        vector<float> dist_pt(const int num, Vertex_3D& pt){
-//            vector<float> ans;
-//            if(num==1){
-//                for(auto p: this->map_a[pt]){
-//
-//                    ans.push_back(p.dist(pt));
-//                }
-//            }
-//            else{
-//
-//                    for(auto p: this->map_b[pt]){
-//
-//                    ans.push_back(p.dist(pt));
-//                }
-//            }
-//            return ans;
-//        }  
-//};
-//void display_image(){
-//    cv::Mat existingImage = cv::imread("existing_image.jpg");
-//
-//    if (existingImage.empty()) {
-//        std::cout << "Could not open or find the image" << std::endl;
-//        return -1;
-//    }
-//
-//    int radius = 5;
-//
-//    for (const Vertex_3D& point : keysVector) {  // Iterate using const reference
-//        cv::Point cvPoint(static_cast<int>(point.x), static_cast<int>(point.y));
-//        cv::circle(existingImage, cvPoint, radius, cv::Scalar(0, 255, 0), -1);
-//    }
-//
-//    cv::imshow("Overlayed Image", existingImage);
-//    cv::waitKey(0);
-//
-//    cv::imwrite("overlayed_image.jpg", existingImage);
-//
-//    return 0;
-//}
+class Feature_Match{
+  public:
+    Feature_Match(unordered_map<Vertex_3D, vector<Vertex_3D>> a, unordered_map<Vertex_3D, vector<Vertex_3D>> b)
+    {
+      this->map_a = a;
+      this->map_b = b;
+      //this->check();
+    }
+    unordered_map<Vertex_3D, vector<Vertex_3D>> check(){
+            unordered_map<Vertex_3D, vector<Vertex_3D>> fp = this->map_a;
+            for(auto pt: this->map_a){
+              bool ans;
+              for(auto ptb: this->map_b){
+
+              
+                vector<float>ap, bp;
+                Vertex_3D point = pt.first;
+                Vertex_3D pointb = ptb.first;
+                ap = this->dist_pt(1, point);
+                bp = this->dist_pt(2, pointb);
+
+                ans = this->is_equal(ap, bp);
+                
+              }
+              if (ans == 0){
+                    fp.erase(pt.first);
+                }
+            }
+
+            return fp;
+        }
+    
+
+        unordered_map<Vertex_3D, vector<Vertex_3D>> map_a;
+        unordered_map<Vertex_3D, vector<Vertex_3D>> map_b;
+        
+        bool is_equal(vector<float> ap,vector<float> bp){
+
+            sort(ap.begin(), ap.end());
+            sort(bp.begin(), bp.end());
+            
+            if (ap.size() != bp.size()){
+              return false;
+            }
+            int sz = bp.size();
+            int threshold = 1;
+            int max_thres = 0.8 * sz;
+
+            int ans = 0;
+            for(int i = 0;i<sz;i++){
+
+                ans+=(abs(ap[i]-bp[i])<threshold);
+            }
+
+
+            return ans>=max_thres ? 1 : 0;
+        }
+
+        vector<float> dist_pt(const int num, Vertex_3D& pt){
+            vector<float> ans;
+            if(num==1){
+                for(auto p: this->map_a[pt]){
+
+                    ans.push_back(p.dist(pt));
+                }
+            }
+            else{
+
+                    for(auto p: this->map_b[pt]){
+
+                    ans.push_back(p.dist(pt));
+                }
+            }
+            return ans;
+        }  
+};
+
 vector<Vertex_3D> readKeypointsFromFile(const string& filename) {
     ifstream file(filename);
     vector<Vertex_3D> vertices;
@@ -408,27 +397,39 @@ vector<Vertex_3D> readKeypointsFromFile(const string& filename) {
 
     return vertices;
 }
+void WriteVerticesToFile(const std::string& filename, vector<Vertex_3D> vertices) {
+        std::ofstream outfile(filename);
+
+        if (!outfile.is_open()) {
+            std::cerr << "Unable to open file for writing: " << filename << std::endl;
+            return;
+        }
+
+        // Write vertices to the file
+        for (const auto& vertex : vertices) {
+            outfile << "Vertex: (" << vertex.x << ", " << vertex.y << ", " << vertex.z << ")\n";
+        }
+
+        outfile.close();
+        std::cout << "Vertices and edges written to file: " << filename << std::endl;
+    }
 int main()
 {
   vector<Vertex_3D> tests_a = readKeypointsFromFile("keypoints.txt");
-  for (const auto& vertex : tests_a) {
-        cout << "x: " << vertex.x << ", y: " << vertex.y << ", z: " << vertex.z << endl;
-  }
-
-  //vector<Vertex_3D> tests_b = readKeypointsFromFile("Feature_Matching_DT\keypoints.txt");
+  vector<Vertex_3D> tests_b = readKeypointsFromFile("keypoints2.txt");
   Delaunay C_a(tests_a);  
   unordered_map<Vertex_3D, vector<Vertex_3D>> neighbor_map_a = C_a.Map_Neigh();
   C_a.WriteVerticesToFile("output_vertices_edges_a.txt");
-  //Delaunay C_b(tests_b);  
-  //unordered_map<Vertex_3D, vector<Vertex_3D>> neighbor_map_b = C_b.Map_Neigh();
+  Delaunay C_b(tests_b);  
+  unordered_map<Vertex_3D, vector<Vertex_3D>> neighbor_map_b = C_b.Map_Neigh();
+  C_b.WriteVerticesToFile("output_vertices_edges_b.txt");
+  Feature_Match Fm(neighbor_map_a, neighbor_map_b);
+  unordered_map<Vertex_3D, vector<Vertex_3D>> feature_map = Fm.check();
 
-  //Feature_Match Fm(neighbor_map_a, neighbor_map_b);
-  //unordered_map<Vertex_3D, vector<Vertex_3D>> feature_map = Fm.check();
-//
-  //vector<Vertex_3D> features;
-  //for (const auto& pt : feature_map){
-  //  features.push_back(pt.first);
-  //}
-
-  return 0;
+  vector<Vertex_3D> features;
+  for (const auto& pt : feature_map){
+    features.push_back(pt.first);
+  }
+  WriteVerticesToFile("final_features.txt",features);
+ return 0;
 }
