@@ -415,7 +415,7 @@ void WriteVerticesToFile(const std::string& filename, vector<Vertex_3D> vertices
     }
 int main()
 {
-  vector<Vertex_3D> tests_a = readKeypointsFromFile("keypoints.txt");
+  vector<Vertex_3D> tests_a = readKeypointsFromFile("keypoints1.txt");
   vector<Vertex_3D> tests_b = readKeypointsFromFile("keypoints2.txt");
   Delaunay C_a(tests_a);  
   unordered_map<Vertex_3D, vector<Vertex_3D>> neighbor_map_a = C_a.Map_Neigh();
